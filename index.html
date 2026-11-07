@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Monte sua cabine</title>
+<meta name="description" content="Personalize sua máquina Fiorini e veja em tamanho real no seu espaço.">
+<!-- Fora do Google até confirmar os direitos do suporte da Alexa e das imagens de anúncios -->
+<meta name="robots" content="noindex, nofollow">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+  :root {
+    --bg: #f4efe6;
+    --panel: #ffffff;
+    --ink: #1d2a2e;
+    --muted: #5f6c70;
+    --brand: #0f7f92;
+    --brand-ink: #ffffff;
+    --line: #e2dacb;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header { padding: 14px 16px 4px; text-align: center; }
+  .marca { margin: 0; font-size: 13px; letter-spacing: .22em; color: var(--brand); font-weight: 700; }
+  h1 { margin: 2px 0 0; font-size: 24px; line-height: 1.15; }
+  main { max-width: 1160px; margin: 0 auto; padding: 10px 16px 20px; display: grid; gap: 12px; }
+  .palco {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: 52dvh;
+    border-radius: 16px;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 35%, #4a4541, #1f1c1a 75%);
+  }
+  model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+  .botao-ar {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    border: 0;
+    border-radius: 999px;
+    background: var(--brand);
+    color: var(--brand-ink);
+    font: inherit;
+    font-weight: 700;
+    padding: 12px 24px;
+    white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(15, 127, 146, .35);
+  }
+  .carregando {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    pointer-events: none;
+  }
+  .carregando[hidden] { display: none; }
+  .painel { display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .cartao { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .cartao h2 { margin: 0 0 6px; font-size: 16px; }
+  .cartao p { margin: 0; color: var(--muted); }
+  ol { margin: 0; padding-left: 20px; color: var(--muted); }
+  .aviso { font-size: 14px; color: var(--muted); text-align: center; margin: 0; }
+  .grupo + .grupo { margin-top: 14px; }
+  .opcoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .opcao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    padding: 6px 12px 6px 6px;
+    min-height: 44px;
+  }
+  .opcao[aria-pressed="true"] { border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand); }
+  .amostra { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, .15); flex: none; }
+  #resumo { font-weight: 600; color: var(--ink); }
+  #qr { display: none; }
+  #qr .codigo { width: 168px; height: 168px; margin-top: 10px; }
+  #qr .codigo img { width: 100%; height: 100%; display: block; }
+  @media (min-width: 900px) {
+    main { grid-template-columns: minmax(0, 1.25fr) minmax(340px, 1fr); align-items: start; }
+    .palco { top: 12px; height: calc(100dvh - 24px); max-height: 760px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <p class="marca">FIORINI CABINES</p>
+  <h1 id="titulo">Monte sua Lush 14</h1>
+</header>
+
+<main>
+  <div class="palco">
+    <model-viewer
+      id="cabine"
+      src="variantes/lush14-do-es-off-white.glb"
+      ios-src="variantes/lush14-do-es-off-white.usdz"
+      alt="Máquina de bronzeamento Fiorini"
+      loading="eager"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      ar-scale="fixed"
+      ar-placement="floor"
+      camera-controls
+      touch-action="pan-y"
+      camera-target="0m 1.05m -0.5m"
+      camera-orbit="-28deg 80deg 7m"
+      min-camera-orbit="auto auto 1m"
+      max-camera-orbit="auto 100deg 10m"
+      environment-image="neutral"
+      shadow-intensity="1"
+      exposure="0.8">
+      <button slot="ar-button" class="botao-ar" id="botao-ar">Ver no meu espaço</button>
+    </model-viewer>
+    <div class="carregando" id="carregando">Carregando a cabine…</div>
+  </div>
+
+  <section class="painel">
+    <div class="cartao">
+      <h2>Personalize</h2>
+      <p id="resumo"></p>
+      <div class="grupo">
+        <p>Modelo</p>
+        <div class="opcoes" id="modelo"></div>
+      </div>
+      <div class="grupo">
+        <p>Acrílico</p>
+        <div class="opcoes" id="acrilico"></div>
+      </div>
+      <div class="grupo">
+        <p>MDF</p>
+        <div class="opcoes" id="mdf"></div>
+      </div>
+      <div class="grupo">
+        <p>Lâmpadas</p>
+        <div class="opcoes" id="lampadas"></div>
+      </div>
+    </div>
+    <div class="cartao">
+      <h2>Como ver</h2>
+      <ol>
+        <li>Toque em “Ver no meu espaço”.</li>
+        <li id="passo-chao">Aponte o celular para o chão e mexa devagar.</li>
+        <li>Posicione a cabine e ande em volta dela.</li>
+      </ol>
+    </div>
+    <div class="cartao">
+      <h2>Tamanho real</h2>
+      <p id="medidas"></p>
+    </div>
+    <div class="cartao" id="qr">
+      <h2>Abra no celular</h2>
+      <p>Aponte a câmera do celular para o código.</p>
+      <div class="codigo" id="codigo"></div>
+    </div>
+    <p class="aviso" id="aviso">Protótipo: medidas e cores ainda podem mudar.</p>
+  </section>
+</main>
+
+<script>
+  const viewer = document.getElementById("cabine");
+  const carregando = document.getElementById("carregando");
+
+  // Os valores seguem acabamentos_lush.py. Cores em hex são as que aparecem na tela.
+  const OPCOES = {
+    modelo: [
+      { id: "lush14", nome: "Lush 14", cor: "#0f7f92", medidas: "96 cm de largura, 103 cm de profundidade e 2,10 m de altura.", alvo: "0m 1.05m -0.5m" },
+      { id: "deluxe14", nome: "Deluxe 14", cor: "#6c5a3a", medidas: "88 cm de largura, 103 cm de profundidade e 2,05 m de altura.", alvo: "0m 1.03m -0.5m" },
+      { id: "compact8", nome: "Compact 8", cor: "#b5789f", medidas: "Cerca de 1,12 m de largura, 39 cm de profundidade e 2,17 m de altura.", alvo: "0m 1.08m -0.1m" },
+    ],
+    acrilico: [
+      // Metal abaixo de 1 só nesta vista 3D: sem um ambiente real para refletir, o espelhado escurece
+      { id: "do-es", nome: "Dourado", cor: "#d9a521", base: [1, 0.6, 0.06], metal: 0.65, rugosidade: 0.12 },
+      { id: "esp-rs", nome: "Rose gold", cor: "#dbb4b3", base: [0.95, 0.61, 0.6], metal: 0.65, rugosidade: 0.12 },
+      { id: "esp-pk", nome: "Rosa pink", cor: "#eb569b", base: [0.95, 0.105, 0.365], metal: 0.3, rugosidade: 0.12 },
+      { id: "pu-743", nome: "Rose gold glitter", cor: "#b5789f", textura: "acrilico-glitter-pu743.png", metal: 0.4, rugosidade: 0.4 },
+    ],
+    mdf: [
+      { id: "off-white", nome: "Off White", cor: "#e5e2d8", rugosidade: 0.5 },
+      { id: "branco", nome: "Branco brilho", cor: "#e9eaea", rugosidade: 0.06 },
+      { id: "preto", nome: "Preto brilho", cor: "#0c0d0d", rugosidade: 0.06 },
+      { id: "rosa", nome: "Rosa Milkshake", cor: "#ddc0af", rugosidade: 0.6 },
+    ],
+    lampadas: [
+      { id: "acesas", nome: "Acesas", cor: "#4fb7ff" },
+      { id: "apagadas", nome: "Apagadas", cor: "#f4f4f2" },
+    ],
+  };
+  const PADRAO = { modelo: "lush14", acrilico: "do-es", mdf: "off-white", lampadas: "acesas" };
+
+  const parametros = new URLSearchParams(location.search);
+  const escolha = {};
+  for (const chave of Object.keys(PADRAO)) {
+    const pedido = parametros.get(chave);
+    escolha[chave] = OPCOES[chave].some((opcao) => opcao.id === pedido) ? pedido : PADRAO[chave];
+  }
+  const opcaoAtual = (chave) => OPCOES[chave].find((opcao) => opcao.id === escolha[chave]);
+
+  function linear(hex) {
+    return [1, 3, 5].map((inicio) => {
+      const canal = parseInt(hex.slice(inicio, inicio + 2), 16) / 255;
+      return canal <= 0.04045 ? canal / 12.92 : ((canal + 0.055) / 1.055) ** 2.4;
+    });
+  }
+
+  const texturas = {};
+  async function pintarAcrilico(material, opcao) {
+    const pbr = material.pbrMetallicRoughness;
+    if (opcao.textura) {
+      texturas[opcao.textura] ??= await viewer.createTexture(opcao.textura);
+      pbr.baseColorTexture.setTexture(texturas[opcao.textura]);
+      pbr.setBaseColorFactor([1, 1, 1, 1]);
+    } else {
+      pbr.baseColorTexture.setTexture(null);
+      pbr.setBaseColorFactor([...opcao.base, 1]);
+    }
+    pbr.setMetallicFactor(opcao.metal);
+    pbr.setRoughnessFactor(opcao.rugosidade);
+  }
+
+  function pintarMdf(material, opcao) {
+    const pbr = material.pbrMetallicRoughness;
+    pbr.setBaseColorFactor([...linear(opcao.cor), 1]);
+    pbr.setRoughnessFactor(opcao.rugosidade);
+  }
+
+  function pintarLampadas(tubo, ponta, acesas) {
+    tubo.pbrMetallicRoughness.setBaseColorFactor(acesas ? [0.18, 0.36, 0.72, 1] : [0.95, 0.97, 1, 1]);
+    tubo.setEmissiveFactor(acesas ? [0.03, 0.34, 1] : [0, 0, 0]);
+    ponta.setEmissiveFactor(acesas ? [0.71, 0.55, 1] : [0, 0, 0]);
+  }
+
+  async function aplicarEscolha() {
+    const modelo = viewer.model;
+    if (!modelo) return;
+    if (!modelo.getMaterialByName("mat_estrutura")) return;
+    await pintarAcrilico(modelo.getMaterialByName("mat_estrutura"), opcaoAtual("acrilico"));
+    pintarMdf(modelo.getMaterialByName("mat_mdf_externo"), opcaoAtual("mdf"));
+    pintarMdf(modelo.getMaterialByName("mat_interior"), opcaoAtual("mdf"));
+    pintarLampadas(modelo.getMaterialByName("mat_tubo"), modelo.getMaterialByName("mat_tubo_ponta"), escolha.lampadas === "acesas");
+  }
+
+  // Na realidade aumentada, cada combinação de acrílico e MDF tem arquivos prontos.
+  // Com as lâmpadas apagadas, o iPhone recebe um arquivo criado pela própria página.
+  const arquivoEscolhido = () => `variantes/${escolha.modelo}-${escolha.acrilico}-${escolha.mdf}`;
+
+  // Cada modelo é um arquivo próprio; trocar de modelo carrega esse arquivo
+  function trocarModelo() {
+    const modelo = opcaoAtual("modelo");
+    document.getElementById("titulo").textContent = `Monte sua ${modelo.nome}`;
+    document.getElementById("medidas").textContent = modelo.medidas;
+    viewer.setAttribute("camera-target", modelo.alvo);
+    const destino = `variantes/${modelo.id}-do-es-off-white.glb`;
+    if (viewer.getAttribute("src") !== destino) {
+      carregando.hidden = false;
+      viewer.setAttribute("src", destino);
+    }
+  }
+
+  function atualizarAr() {
+    if (escolha.lampadas === PADRAO.lampadas) viewer.setAttribute("ios-src", `${arquivoEscolhido()}.usdz`);
+    else viewer.removeAttribute("ios-src");
+  }
+
+  // O Android abre o arquivo do endereço src, então a troca acontece só ao tocar no botão
+  document.getElementById("botao-ar").addEventListener("click", () => {
+    const destino = `${arquivoEscolhido()}.glb`;
+    if (/Android/i.test(navigator.userAgent) && viewer.getAttribute("src") !== destino) {
+      viewer.setAttribute("src", destino);
+    }
+  }, { capture: true });
+
+  function atualizarResumo() {
+    document.getElementById("resumo").textContent =
+      `${opcaoAtual("modelo").nome}: ${opcaoAtual("acrilico").nome} com ${opcaoAtual("mdf").nome}, LED branco quente`;
+    const consulta = new URLSearchParams(escolha).toString();
+    history.replaceState(null, "", `${location.pathname}?${consulta}`);
+  }
+
+  function escolher() {
+    trocarModelo();
+    atualizarResumo();
+    atualizarAr();
+    mostrarCodigo();
+    aplicarEscolha();
+  }
+
+  function montarOpcoes(chave) {
+    const caixa = document.getElementById(chave);
+    for (const opcao of OPCOES[chave]) {
+      const botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "opcao";
+      botao.setAttribute("aria-pressed", String(opcao.id === escolha[chave]));
+      const amostra = document.createElement("span");
+      amostra.className = "amostra";
+      amostra.style.background = opcao.cor;
+      botao.append(amostra, opcao.nome);
+      botao.addEventListener("click", () => {
+        escolha[chave] = opcao.id;
+        for (const irmao of caixa.children) irmao.setAttribute("aria-pressed", String(irmao === botao));
+        escolher();
+      });
+      caixa.append(botao);
+    }
+  }
+  Object.keys(OPCOES).forEach(montarOpcoes);
+
+  viewer.addEventListener("load", async () => {
+    await aplicarEscolha();
+    carregando.hidden = true;
+  });
+  viewer.addEventListener("error", () => {
+    carregando.textContent = "Não foi possível carregar a cabine.";
+  });
+  viewer.addEventListener("ar-status", (event) => {
+    if (event.detail.status === "failed") {
+      document.getElementById("aviso").textContent = "Este celular não abriu a realidade aumentada. Você ainda pode personalizar a cabine aqui na tela.";
+    }
+  });
+
+  // Meta Quest: abre direto no óculos, pelo modo webxr do model-viewer
+  const oculos = /OculusBrowser|Quest/i.test(navigator.userAgent);
+  if (oculos) {
+    document.getElementById("passo-chao").textContent = "Aceite o pedido de acesso ao espaço e olhe para o chão.";
+    viewer.addEventListener("load", () => setTimeout(() => {
+      if (!viewer.canActivateAR) {
+        document.getElementById("aviso").textContent = "O navegador do óculos não liberou a realidade aumentada. Atualize o Quest e abra esta página pelo navegador dele.";
+      }
+    }, 2000), { once: true });
+  }
+
+  // No computador, mostra um código para abrir a mesma escolha no celular
+  const celular = oculos || /iPhone|iPad|Android/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let enderecoBase = null;
+  async function mostrarCodigo() {
+    if (celular || typeof qrcode === "undefined") return;
+    if (enderecoBase === null) {
+      enderecoBase = `${location.origin}${location.pathname}`;
+      try {
+        const resposta = await fetch("/endereco");
+        if (resposta.ok) enderecoBase = await resposta.text();
+      } catch (erro) {
+        // Hospedada fora do servidor local, a página usa o próprio endereço
+      }
+    }
+    const codigo = qrcode(0, "M");
+    codigo.addData(`${enderecoBase}?${new URLSearchParams(escolha)}`);
+    codigo.make();
+    document.getElementById("codigo").innerHTML = codigo.createImgTag(6, 12, "Código para abrir esta escolha no celular");
+    document.getElementById("qr").style.display = "block";
+  }
+
+  trocarModelo();
+  atualizarResumo();
+  atualizarAr();
+  mostrarCodigo();
+</script>
+</body>
+</html>
